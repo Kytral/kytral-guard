@@ -100,6 +100,29 @@ share the secret and the same `KYTRAL_HOME` path compute the same ids: give each
 | `*.lock`, `*.tmp`, `*.moved-aside`, `kill-switch.id` | no | | a lock can delay a writer (a `kill` never waits more than 1 s); the others are never read |
 | `KYTRAL_HOME` (or `KYTRAL_AUDIT`, or the home folder replaced by a link) redirected to another home | the guard then uses that home | ids follow real paths (a link in the path reaches the same folder) | no copy: this home's own files are out of sight. Redirected to a blank home, it is like a wipe: the kill is lifted for new processes (agent hooks, proxies and SDK guards started afterwards); a proxy (or SDK guard) already running keeps the id it started with and stays stopped (the limits above; `doctor` and the hooks warn about it: a warning, not a block) |
 
+## Windows
+
+Kytral Guard and its test suite run on Windows too (the suite in CI). What differs there:
+
+- **File permissions.** On Linux and macOS, `KYTRAL_HOME` is created owner-only (0700), and so are its files (0600).
+  Windows has no such modes: the access control lists (ACLs) of the folder decide who can read or change the secret and
+  the state files. `~/.kytral` inherits those of the user profile (by default, only that user, administrators and
+  SYSTEM have access); a `KYTRAL_HOME` outside the profile inherits those of its parent folder, which may let other
+  users read it: restrict them yourself. Kytral Guard refuses no file for its owner or its mode, on any system; what
+  Windows skips is the warning of `kytral-guard doctor` when other users can open `KYTRAL_HOME` (it reads the mode),
+  and narrowing back to owner-only a `confirmations` folder that already existed. The tests of these modes do not run
+  on Windows, nor those that make the audit log or its tail marker unreadable with `chmod`, which cannot take read
+  access away there.
+- **Symbolic links.** Creating one on Windows needs Developer Mode, or a process run as administrator. The guard checks
+  links the same way there (a link in place of the default secret file is refused, state files are checked through
+  links, ids follow real paths), but their tests are limited: the one for a link planted in place of the secret file is
+  skipped when no link can be made, the one for Homebrew's links does not run on Windows, and the others that plant a
+  link need one of the two.
+- **Kill switch.** Several processes running `kill` and `resume` at once are tested on Linux and macOS, not on Windows:
+  the test starts them from bash. The file lock they rely on is tested on Windows too, by several processes that write
+  the audit log, revocations or grants at once. The ids of paths that hold a line break, which no Windows file name can
+  hold, are tested on the other systems only.
+
 ## Design decisions
 
 - **Fail closed.** When the guard cannot decide, the answer is no. Most agents run the tool when a hook fails, so the

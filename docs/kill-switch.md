@@ -214,3 +214,6 @@ lift them, and `guard.resume()` does not lift `kytral-guard kill`.
   place of another operator's `KYTRAL_HOME` makes their routine `resume` act here). The coding-agent preset blocks the
   obvious ways (`cat ~/.kytral/secret`, `kytral-guard resume` run by the agent), not every way. A kill switch that an
   agent cannot lift needs its key off the machine (Kytral Guard Pro, coming soon).
+- On Windows, several processes running `kill` and `resume` at once are not tested (the test needs bash), and the
+  switch's files are protected by the folder's ACLs, not by the modes 0600 and 0700: see
+  [Windows](threat-model.md#windows) in the threat model.

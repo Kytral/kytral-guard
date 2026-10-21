@@ -6,7 +6,7 @@
 import { test } from "node:test"; import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, symlinkSync, unlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os"; import { join, resolve } from "node:path";
 import { AuditLog, auditKey } from "../src/audit.js";
 import { canonicalJson, confirmKey, decide, FileConfirmQueue, listRequests } from "../src/confirm-queue.js";
@@ -102,6 +102,14 @@ test("a kept call is signed for its kept-calls.jsonl: another home's, an edited 
   assert.equal(kept.seq, theirKept.seq, "the same seq in both homes");
   copyFileSync(join(other, "kept-calls.jsonl"), join(h, "kept-calls.jsonl"));
   const r = cli(h, ["allow", "--call", String(kept.seq)]); assert.equal(r.code, 1, r.out); assert.match(r.err, new RegExp(`no text is kept for call ${kept.seq}`));
+});
+
+test("a kept call whose folder is created on first use, reached through a link (as /var is a link to /private/var on macOS), is signed for the folder's real path: read back through the link and through the real path", () => {
+  const d = tmp(), real = join(d, "real"), link = join(d, "link"); mkdirSync(real); symlinkSync(real, link);
+  const file = join(link, "home", "kept-calls.jsonl");   // "home" does not exist yet: keepCall creates it
+  assert.ok(keepCall({ seq: 3, agent: "claude-code", tool: "Bash", decision: "ask", rule: "git-history", args: { command: "git reset --hard HEAD~1" } }, S, file));
+  assert.deepEqual(readKeptCalls(S, file).map(k => k.text), ["git reset --hard HEAD~1"], "through the link");
+  assert.deepEqual(readKeptCalls(S, join(real, "home", "kept-calls.jsonl")).map(k => k.text), ["git reset --hard HEAD~1"], "through the real path");
 });
 
 test("another home with the same secret copied whole over this one (every file of its KYTRAL_HOME): the kill is not lifted, and once this home resumes, none of its grants, kept calls or pending requests counts here", { timeout: 120000 }, async () => {

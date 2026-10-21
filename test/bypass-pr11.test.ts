@@ -102,7 +102,7 @@ test("invalid_state_journaled_once_and_kill_resume_journaled", () => {
 });
 
 // ---------- concurrency ----------
-test("parallel_kill_and_resume_processes_end_in_a_consistent_state", { timeout: 60000 }, () => {
+test("parallel_kill_and_resume_processes_end_in_a_consistent_state", { timeout: 60000, skip: process.platform === "win32" && "needs bash" }, () => {
   const h = tmp(); const cli = join(import.meta.dirname, "..", "src/cli.ts");
   const env = `KYTRAL_HOME=${h} KYTRAL_AUDIT=${h}/audit.jsonl KYTRAL_SECRET=${S}`;
   execSync(`for i in 1 2 3 4; do (${env} node --import tsx ${cli} kill >/dev/null 2>&1 &); (${env} node --import tsx ${cli} resume >/dev/null 2>&1 &); done; sleep 8`, { shell: "/bin/bash" });

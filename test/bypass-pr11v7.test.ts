@@ -71,7 +71,8 @@ test("relative_and_dotdot_paths: relative and '..' paths to the same file => the
   } finally { process.chdir(cwd); }
 });
 test("special_chars_and_newline_in_path: '\\n', spaces, unicode; neighboring prefixes => distinct ids, no cross lift", () => {
-  const base = tmp(), names = ["a", "a\nb", "a b", "a\n", "é", "a/kill-switch.json\n", "kill-switch\ndep"].map((n, i) => n.includes("/") ? join(base, `p${i}`, n.split("/")[0]) : join(base, n));
+  // a file name cannot hold '\n' on Windows: the names that do are tried on the other systems
+  const base = tmp(), names = ["a", "a\nb", "a b", "a\n", "é", "a/kill-switch.json\n", "kill-switch\ndep"].filter(n => process.platform !== "win32" || !n.includes("\n")).map((n, i) => n.includes("/") ? join(base, `p${i}`, n.split("/")[0]) : join(base, n));
   const homes = names.map((d) => { mkdirSync(d, { recursive: true }); return d; });
   const deps = new Set<string>(); for (const d of homes) { cycles(ks(d), 1); deps.add(depOf(ks(d))); }
   assert.equal(deps.size, homes.length, "all ids distinct");

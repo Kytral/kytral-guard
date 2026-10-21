@@ -4,8 +4,8 @@ Kytral Guard is a security tool, so reports of security problems in it come firs
 
 ## Reporting a vulnerability
 
-Report it privately, by email to **security@kytral.com**. Once the repository is public, you can also use GitHub private
-vulnerability reporting: open the **Security** tab of this repository, then **Report a vulnerability**.
+Report it privately, either by email to **security@kytral.com** or with GitHub private vulnerability reporting: open the
+**Security** tab of this repository, then **Report a vulnerability**.
 
 Never report a vulnerability in a public issue, discussion, pull request or comment. If you are not sure whether something is a
 vulnerability, report it privately: we will tell you if it can go to a public issue.
@@ -59,4 +59,5 @@ Security fixes go to the current minor release. Please upgrade to it before repo
 ## Scope and limits
 
 The threat model, including what Kytral Guard does not protect against (for example a determined process running as the
-same OS user), is in [docs/threat-model.md](docs/threat-model.md).
+same OS user), is in [docs/threat-model.md](docs/threat-model.md); what differs on Windows (file permissions, symbolic
+links, what is not tested there) is in its [Windows](docs/threat-model.md#windows) section.

@@ -150,8 +150,12 @@ export function keepCall(c: { seq?: number; ts?: string; agent: string; tool: st
     const body: Omit<KeptCall, "mac"> = { v: 1, ...(c.seq !== undefined ? { seq: c.seq } : {}), ts: c.ts ?? new Date().toISOString(), agent: c.agent, tool: c.tool,
       decision: c.decision, ...(c.rule ? { rule: c.rule } : {}), ...(c.reason ? { reason: maskSecrets(c.reason.slice(0, 900)).slice(0, 500) } : {}),
       text: callText(c.tool, c.args), ...(c.cwd ? { cwd: c.cwd } : {}) };
-    const entry: KeptCall = { ...body, mac: keptMac(keptCallsKey(theSecret(secret), path), body) };
+    const root = theSecret(secret);   // no usable secret: nothing is kept, and no folder created
+    // the folder before the key: the key is bound to the folder's real path (keptCallsKey), which only a folder that exists
+    // has; derived from the path as given, it would differ wherever a link leads there (/var on macOS), and no reader would
+    // ever verify the call
     mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+    const entry: KeptCall = { ...body, mac: keptMac(keptCallsKey(root, path), body) };
     // agent hooks keep the calls they refuse: nothing here may wait (a FIFO in place of the file is refused, not opened)
     withFileLock(path, () => {
       appendRegular(path, JSON.stringify(entry) + "\n");

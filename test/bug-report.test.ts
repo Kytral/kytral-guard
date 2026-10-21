@@ -402,8 +402,8 @@ test("issue forms and SECURITY.md: the bug form asks for doctor --report, vulner
   assert.match(policy, new RegExp(`^\\| ${major}\\.${minor}\\.x \\| Yes \\|$`, "m"), "the current minor release is supported");
   assert.match(policy, new RegExp(`^\\| < ${major}\\.${minor} \\| No \\|$`, "m"), "older ones are not");
   for (const s of ["security@kytral.com", "Report a vulnerability", "2 business days", "7 days", "30 days"]) assert.ok(policy.includes(s), s);
-  // email first; GitHub's private reporting works only once the repository is public; the response times are targets
-  assert.match(policy, /^Report it privately, by email to \*\*security@kytral\.com\*\*\. Once the repository is public, you can also use GitHub private\s+vulnerability reporting/m);
+  // two private channels, email and GitHub's private vulnerability reporting; the response times are targets
+  assert.match(policy, /^Report it privately, either by email to \*\*security@kytral\.com\*\* or with GitHub private vulnerability reporting: open the\s+\*\*Security\*\* tab/m);
   assert.match(policy, /^We aim to:\n\n- acknowledge your report within 2 business days;\n- .* within 7 days;\n- .* within 30 days\.$/m);
   assert.ok(config.contact_links.some((l: any) => /by email to security@kytral\.com/.test(l.about)));
 });

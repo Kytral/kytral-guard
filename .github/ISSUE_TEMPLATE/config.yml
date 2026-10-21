@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Report a security vulnerability
     url: https://github.com/Kytral/kytral-guard/security/policy
-    about: Never in a public issue. Report it privately, by email to security@kytral.com, as the security policy (SECURITY.md) explains.
+    about: Never in a public issue. Report it privately, by email to security@kytral.com or with GitHub private vulnerability reporting (Security tab, then Report a vulnerability), as the security policy (SECURITY.md) explains.
   - name: Kytral Guard Pro (teams)
     url: https://kytral.com
     about: Remote approvals, fleet-wide kill switch, central policies and anchored audit.
