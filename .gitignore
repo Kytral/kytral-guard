@@ -1,0 +1,25 @@
+node_modules
+dist
+coverage
+*.tgz
+.DS_Store
+# Kytral state files, in case KYTRAL_HOME points inside the repo (secret, grants, pending calls with their arguments, locks)
+/secret
+/policy.yaml
+*.jsonl
+*.jsonl.tail
+kytral-revocations.json
+kytral-nonces.json
+*.tmp
+known-tools.json
+*.tombstones.json
+allowlist.json
+revocations.json
+nonces.json
+kill-switch.json
+kill-switch.id
+confirmations/
+*.lock
+*.kytral-backup
+# local secrets
+.env

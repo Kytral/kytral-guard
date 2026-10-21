@@ -1,0 +1,95 @@
+{
+  "name": "kytral-guard",
+  "version": "0.1.0",
+  "description": "The anti-catastrophe guard for AI agents: blocks rm -rf ~, DROP TABLE, terraform destroy, force-pushes to main and other destructive actions before they run. Hooks for 21 coding agents (Claude Code, Cursor, Codex, Gemini CLI, Copilot CLI, Windsurf, Grok Build, Qwen Code, Kimi Code, iFlow, Qoder, CodeBuddy, TRAE, opencode, MiMo Code, Droid, Auggie, Devin, Kiro, Amp, Cline), an MCP proxy for AI apps, a TypeScript SDK, a kill switch and a tamper-evident audit log.",
+  "keywords": [
+    "ai-agents",
+    "ai-safety",
+    "agent-security",
+    "guardrails",
+    "mcp",
+    "model-context-protocol",
+    "claude-code",
+    "cursor",
+    "codex",
+    "gemini-cli",
+    "copilot",
+    "hooks",
+    "kill-switch",
+    "audit-log",
+    "llm",
+    "devsecops",
+    "sql",
+    "shell",
+    "grok",
+    "kimi",
+    "trae",
+    "opencode",
+    "mimo",
+    "windsurf",
+    "mcp-proxy",
+    "qwen",
+    "iflow",
+    "qoder",
+    "codebuddy",
+    "droid",
+    "auggie",
+    "devin",
+    "kiro",
+    "amp",
+    "cline"
+  ],
+  "homepage": "https://github.com/Kytral/kytral-guard#readme",
+  "bugs": {
+    "url": "https://github.com/Kytral/kytral-guard/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kytral/kytral-guard.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Kytral (https://kytral.com)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "kytral-guard": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node -e \"fs.rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.json && node scripts/bundle.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node scripts/test.mjs",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "dependencies": {
+    "node-sql-parser": "^5.4.0",
+    "shell-quote": "^1.12.0",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/server-filesystem": "^1.0.0",
+    "@types/node": "^22.20.5",
+    "@types/shell-quote": "^1.7.5",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

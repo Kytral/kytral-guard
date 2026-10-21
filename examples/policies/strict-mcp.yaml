@@ -1,0 +1,16 @@
+# A strict policy for an MCP server exposed to an agent (kytral-guard --policy strict-mcp.yaml -- <server>).
+extends: strict
+unknownTools: block              # tools the server never advertised are refused outright
+knownTools: ["internal_*"]       # tools you add server-side before they appear in tools/list
+rules:
+  # This server only reads: any write is refused, even a "safe" one.
+  - name: read-only-database
+    tool: 'query'
+    argMatches: '^\s*(insert|update|delete|merge|upsert|create|alter|drop|truncate|grant|revoke|copy|call|exec)\b'
+    action: block
+
+  # Refunds above 100 (in the smallest currency unit) need a human.
+  - name: large-refunds
+    tool: '*refund*'
+    argMatches: '"amount":\s*([1-9]\d{3,}|[2-9]\d{2})\b'
+    action: confirm

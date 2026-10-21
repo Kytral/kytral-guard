@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      - name: CLI smoke test
+        shell: bash
+        run: |
+          expect() { local want=$1 got=0; shift; "$@" >/dev/null || got=$?; [ "$got" -eq "$want" ] || { echo "expected exit $want, got $got: $*"; exit 1; }; }
+          node dist/cli.js --version
+          expect 2 node dist/cli.js check "rm -rf ~"
+          expect 0 node dist/cli.js check "rm -rf node_modules"
+          expect 2 bash -c "echo '{\"hook_event_name\":\"PreToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"terraform destroy\"}}' | node dist/cli.js hook claude-code"
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Package contents
+        run: npm pack --dry-run
+      - name: Install the packed tarball and run it
+        run: |
+          npm pack
+          mkdir /tmp/kg && cd /tmp/kg && npm init -y >/dev/null && npm install "$GITHUB_WORKSPACE"/kytral-guard-*.tgz
+          npx kytral-guard --version
+          set +e
+          npx kytral-guard check "git push --force origin main"; [ $? -eq 2 ] || exit 1
+          # a large call is analyzed in a worker thread: the worker file must ship in the package
+          node -e 'process.stdout.write(JSON.stringify({hook_event_name:"PreToolUse",tool_name:"Bash",tool_input:{command:"rm -rf ~ ; echo "+"QUJD".repeat(20000)}}))' > big.json
+          npx kytral-guard hook claude-code < big.json; [ $? -eq 2 ] || exit 1

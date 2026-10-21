@@ -1,0 +1,22 @@
+# A team policy for coding agents (Claude Code, Cursor, Codex...).
+# Install it as ~/.kytral/policy.yaml, or point hooks at it with KYTRAL_POLICY=/path/to/coding-agent-team.yaml.
+# Check it before deploying:  kytral-guard policy validate coding-agent-team.yaml
+#                             kytral-guard check --policy coding-agent-team.yaml "psql -h db.prod.internal -c 'SELECT 1'"
+extends: coding-agent     # these rules come first, then the preset's
+rules:
+  # Production is off-limits for agents, whatever the command or tool.
+  - name: no-production
+    argMatches: '\b(db|redis|kafka)\.prod\.internal\b|DATABASE_URL_PROD|--context[= ]prod\b|AWS_PROFILE=prod\b'
+    action: block
+
+  # A human approves every deploy and every release.
+  - name: confirm-deploys
+    argMatches: '\b(vercel\s+(deploy\s+)?--prod|fly\s+deploy|firebase\s+deploy|npm\s+publish|gh\s+release\s+create)\b'
+    argFields: [command]
+    action: confirm
+
+  # Routine for this team: let these run without asking (narrow, anchored, command field only).
+  - name: allow-local-db-reset
+    argMatches: '^(supabase db reset|npx prisma migrate reset --force --skip-seed)$'
+    argFields: [command]
+    action: allow

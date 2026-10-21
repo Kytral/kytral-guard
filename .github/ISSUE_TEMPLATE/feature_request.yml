@@ -1,0 +1,37 @@
+name: Feature request
+description: A new integration, a policy capability, an analyzer or catalog entry, or another improvement.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A security vulnerability is not a feature request: follow the [security policy](https://github.com/Kytral/kytral-guard/security/policy) and never report it in a public issue.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do, and what stops you today? Which catastrophe or workflow is not covered?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What Kytral Guard should do. A command, a policy snippet or an example call helps.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: input
+    id: client
+    attributes:
+      label: Agent or client
+      description: The AI agent, MCP client or integration this is for, if any.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else. Issues are public, so never paste a secret, a badge, an audit log or private data.

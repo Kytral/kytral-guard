@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="dark">
+<title>Kytral Guard</title>
+<link rel="icon" href="/mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/app.css">
+<script src="/i18n.js" defer></script>
+<script src="/app.js" defer></script>
+</head>
+<body data-mode="simple">
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <img class="wordmark" src="/wordmark.svg" alt="Kytral" width="78" height="30">
+      <span class="sep" aria-hidden="true"></span>
+      <span class="label" data-i18n>Guard · Dashboard</span>
+    </div>
+    <div class="top-meta">
+      <span class="chip where" title="This page is served by kytral-guard dashboard, on this computer only" data-i18n data-i18n-attr="title">This computer only</span>
+      <span class="chip live" role="status"><i class="dot wait" id="statusDot"></i><span id="statusText">Connecting…</span></span>
+      <div class="seg mode" role="radiogroup" aria-label="View" data-i18n-attr="aria-label" id="modeSwitch">
+        <button type="button" role="radio" aria-checked="true" data-mode="simple" data-i18n>Simple</button>
+        <button type="button" role="radio" aria-checked="false" data-mode="advanced" data-i18n>Advanced</button>
+      </div>
+      <button class="btn danger" id="killBtn" type="button" data-act="kill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/></svg><span data-i18n>Stop all agents</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="banner kill" id="killBanner" hidden>
+  <div class="banner-in">
+    <p data-i18n><strong data-i18n>All agents are stopped.</strong> <span id="killText"></span> Agents can stop themselves; only you can resume.</p>
+    <button class="btn primary" type="button" data-act="resume" data-i18n>Resume</button>
+  </div>
+</div>
+<div class="banner offline" id="offlineBanner" hidden>
+  <div class="banner-in"><p data-i18n><strong data-i18n>The dashboard stopped.</strong> Its command was closed. Start <span class="mono">kytral-guard dashboard</span> again to see what your agents do.</p></div>
+</div>
+
+<main class="center" id="loading">
+  <div class="loading" role="status"><img src="/mark.svg" alt="" width="56" height="56"><span data-i18n>Loading your dashboard…</span></div>
+</main>
+
+<main class="center" id="signin" hidden>
+  <div class="panel signin-card">
+    <img src="/mark.svg" alt="" width="64" height="64">
+    <h1 data-i18n>Sign in to your dashboard</h1>
+    <p id="signinText"></p>
+    <ol class="steps">
+      <li data-i18n>In a terminal, run <span class="mono">kytral-guard dashboard</span>.</li>
+      <li data-i18n>Open the link it prints. It signs you in once.</li>
+      <li data-i18n>Already running? Press Enter in its terminal for a new link.</li>
+    </ol>
+  </div>
+</main>
+
+<main class="simple" id="simpleView" hidden>
+  <section class="panel hero" id="hero" data-state="ok" aria-labelledby="heroTitle">
+    <div class="hero-icon" id="heroIcon" aria-hidden="true"></div>
+    <div class="hero-text">
+      <span class="tagline" id="heroDate"></span>
+      <h1 id="heroTitle"></h1>
+      <p id="heroSub"></p>
+    </div>
+    <div class="hero-actions">
+      <button class="btn big primary" type="button" id="protectAll" data-act="protect-all" hidden data-i18n>Protect everything found</button>
+      <button class="btn big danger" type="button" id="heroStop" data-act="kill"></button>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-needs">
+    <div class="sec-head"><h2 id="h-needs" data-i18n>Needs your answer</h2><button type="button" class="linkbtn" id="notifyBtn" hidden data-i18n>Notify me when something needs me</button></div>
+    <div class="panel" id="simpleApprovals"></div>
+  </section>
+
+  <section aria-labelledby="h-today">
+    <div class="sec-head"><h2 id="h-today" data-i18n>What happened today</h2><span class="muted" id="safeCount"></span></div>
+    <div class="panel"><ol class="feed" id="feed"></ol></div>
+  </section>
+
+  <section aria-labelledby="h-level">
+    <h2 id="h-level" data-i18n>How careful should Kytral Guard be?</h2>
+    <div class="levels" role="radiogroup" aria-labelledby="h-level" id="levels"></div>
+    <p class="level-custom" id="levelCustom" hidden data-i18n>You changed some rules in Advanced, so your protection is custom. Pick a level to start again from it.</p>
+    <p class="level-foot" data-i18n>At every level, disasters stay blocked: erasing your files or a whole database, destroying servers, overwriting code that others share.</p>
+  </section>
+
+  <section aria-labelledby="h-watched">
+    <h2 id="h-watched" data-i18n>What Kytral Guard watches</h2>
+    <div class="panel" id="watched"></div>
+  </section>
+
+  <div class="simple-foot">
+    <p data-i18n>Want every detail? <button type="button" class="linkbtn" data-mode="advanced" data-i18n>Switch to Advanced</button> for rules, exceptions and the full log.</p>
+    <label class="lang"><span data-i18n>Language</span> <select class="sel" data-lang></select></label>
+  </div>
+</main>
+
+<div class="shell" id="advancedView" hidden>
+  <nav class="rail" aria-label="Sections" data-i18n-attr="aria-label">
+    <button type="button" data-tab="activity" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span data-i18n>Activity</span></button>
+    <button type="button" data-tab="rules">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span data-i18n>Rules</span></button>
+    <button type="button" data-tab="exceptions">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span data-i18n>Exceptions</span><span class="count" id="excCount" hidden></span></button>
+    <button type="button" data-tab="approvals">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span data-i18n>Approvals</span><span class="count" id="apprCount" hidden></span></button>
+    <button type="button" data-tab="agents">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="12" rx="2"/><path d="M9 21h6M12 17v4"/></svg><span data-i18n>Agents &amp; apps</span><span class="count warn" id="agentWarn" hidden></span></button>
+    <button type="button" data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-i18n>Settings</span></button>
+    <div class="rail-foot">
+      <p data-i18n>This page lives on this computer and closes with the <span class="mono">kytral-guard dashboard</span> command.</p>
+      <div class="pro">
+        <div class="pro-top"><span class="tagline small">Team</span><span class="soon" data-i18n>Coming soon</span></div>
+        <p data-i18n><b data-i18n>For companies.</b> Groups with their own rules and approvers, approvals from your phone or Slack, one stop button for every machine, one shared log.</p>
+        <a class="linkbtn" href="https://kytral.com" target="_blank" rel="noopener noreferrer" data-i18n>Join the waitlist</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section data-view="activity" aria-labelledby="h-activity">
+      <div class="head">
+        <span class="tagline" id="actDate"></span>
+        <h1 id="h-activity" data-i18n>Activity</h1>
+        <p class="lede" data-i18n>Every tool call your agents made, and what Kytral Guard decided. Open a blocked or asked command to choose what happens to it next time.</p>
+      </div>
+      <div class="panel">
+        <div class="summary">
+          <div class="stat"><div class="eyebrow" data-i18n>Checked today</div><div class="n" id="nChecked">0</div></div>
+          <div class="stat allowed"><div class="eyebrow" data-i18n>Allowed</div><div class="n" id="nAllowed">0</div></div>
+          <div class="stat asked"><div class="eyebrow" data-i18n>Asked you</div><div class="n" id="nAsked">0</div></div>
+          <div class="stat blocked"><div class="eyebrow" data-i18n>Blocked</div><div class="n" id="nBlocked">0</div></div>
+          <div class="integrity" id="integrity"><div class="ok" id="integrityTitle"></div><p id="integrityText"></p></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-head">
+            <span class="eyebrow" data-i18n>Asked and blocked, per hour today</span>
+            <span class="legend"><span><i class="sw asked"></i><span data-i18n>Asked you</span></span><span><i class="sw blocked"></i><span data-i18n>Blocked</span></span></span>
+          </div>
+          <svg id="chart" role="img" aria-label="Calls asked or blocked per hour today" data-i18n-attr="aria-label"></svg>
+        </div>
+      </div>
+      <div class="filters">
+        <label class="search" for="q"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search a command, a tool, a folder…" autocomplete="off" aria-label="Search the log" data-i18n-attr="placeholder aria-label"></label>
+        <div class="seg" role="radiogroup" aria-label="Decision" data-i18n-attr="aria-label" id="decFilter">
+          <button type="button" role="radio" aria-checked="true" data-f="all" data-i18n>All</button>
+          <button type="button" role="radio" aria-checked="false" data-f="blocked" data-i18n>Blocked</button>
+          <button type="button" role="radio" aria-checked="false" data-f="asked" data-i18n>Asked</button>
+          <button type="button" role="radio" aria-checked="false" data-f="allowed" data-i18n>Allowed</button>
+          <button type="button" role="radio" aria-checked="false" data-f="changes" data-i18n>Changes</button>
+        </div>
+        <select class="sel" id="agentFilter" aria-label="Agent" data-i18n-attr="aria-label"></select>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col" data-i18n>Time</th><th scope="col" data-i18n>Agent</th><th scope="col" data-i18n>Call</th><th scope="col" data-i18n>Decision</th><th scope="col" data-i18n>Rule</th></tr></thead>
+            <tbody id="events"></tbody>
+          </table>
+        </div>
+        <div class="tablefoot" id="tableFoot"></div>
+      </div>
+    </section>
+
+    <section data-view="rules" aria-labelledby="h-rules" hidden>
+      <div class="head">
+        <span class="tagline" data-i18n>Policy</span>
+        <h1 id="h-rules" data-i18n>Rules</h1>
+        <p class="lede" data-i18n>Choose what happens for each kind of action: block it, ask you, or allow it. Every change is written to the log.</p>
+        <p class="levelnote" id="levelNote"></p>
+      </div>
+      <div class="scope">
+        <div class="seg" role="tablist" aria-label="Who the rules apply to" data-i18n-attr="aria-label" id="scopeTabs">
+          <button type="button" role="tab" aria-selected="true" data-scope="agents" id="tab-agents" aria-controls="rules" data-i18n>Coding agents</button>
+          <button type="button" role="tab" aria-selected="false" data-scope="apps" id="tab-apps" aria-controls="rules" data-i18n>AI apps (MCP servers)</button>
+        </div>
+        <span class="path" id="scopePath"></span>
+      </div>
+      <div class="callout" id="scopeNote"></div>
+      <div class="panel" id="rules" role="tabpanel" aria-labelledby="tab-agents"></div>
+    </section>
+
+    <section data-view="exceptions" aria-labelledby="h-exc" hidden>
+      <div class="head">
+        <span class="tagline" data-i18n>Decided once</span>
+        <h1 id="h-exc" data-i18n>Exceptions</h1>
+        <p class="lede" data-i18n>Exact commands and MCP tools you decided once for all. An allowed command is still blocked if it ever turns catastrophic, for example when a script it runs is changed.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-i18n>Exact commands</h2><span class="eyebrow" id="excFile"></span></div>
+        <div class="list" id="excCommands"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-i18n>MCP tools approved for good</h2><span class="eyebrow" id="knownFile"></span></div>
+        <div class="list" id="excTools"></div>
+      </div>
+    </section>
+
+    <section data-view="approvals" aria-labelledby="h-appr" hidden>
+      <div class="head">
+        <span class="tagline" data-i18n>Waiting for you</span>
+        <h1 id="h-appr" data-i18n>Approvals</h1>
+        <p class="lede" data-i18n>Calls that need you while nobody can be asked elsewhere: your AI apps' MCP servers, and agents that cannot show a prompt. Without an answer in time, the call is refused.</p>
+      </div>
+      <div class="panel"><div id="approvals"></div></div>
+      <p class="aside" data-i18n>The same as <span class="mono">kytral-guard confirm list</span>, <span class="mono">approve</span> and <span class="mono">deny</span> in a terminal. Coming soon with Kytral Guard Team: these requests on your phone and in Slack.</p>
+    </section>
+
+    <section data-view="agents" aria-labelledby="h-agents" hidden>
+      <div class="head">
+        <span class="tagline" data-i18n>Found on this computer</span>
+        <h1 id="h-agents" data-i18n>Agents &amp; apps</h1>
+        <p class="lede" data-i18n>The coding agents Kytral Guard checks through their hooks, and the MCP servers of your AI apps.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-i18n>Coding agents</h2><button type="button" class="btn small primary push" id="protectAll2" data-act="protect-all" hidden data-i18n>Protect everything found</button></div>
+        <div class="list" id="agentsList"></div>
+        <p class="panel-foot" data-i18n>21 coding agents are supported. Any you install later shows up here automatically.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-i18n>AI apps</h2><span class="eyebrow" data-i18n>MCP proxy</span></div>
+        <div class="list" id="appsList"></div>
+      </div>
+    </section>
+
+    <section data-view="settings" aria-labelledby="h-settings" hidden>
+      <div class="head">
+        <span class="tagline" data-i18n>This computer</span>
+        <h1 id="h-settings" data-i18n>Settings</h1>
+        <p class="lede" data-i18n>Everything stays in <span class="mono" id="homePath">~/.kytral</span>, on this computer. Nothing is sent anywhere.</p>
+      </div>
+      <div class="panel">
+        <div class="toggle-row">
+          <div><b data-i18n>Language</b>
+            <p data-i18n>The language of this page. The commands, the rules' examples and the log stay as they are.</p></div>
+          <select class="sel" data-lang aria-label="Language" data-i18n-attr="aria-label"></select>
+        </div>
+        <div class="toggle-row">
+          <div><b data-i18n>Keep the text of blocked and asked calls</b>
+            <p data-i18n>Lets you make an exception from Activity. Kept apart from the log, which never stores arguments. Passwords, tokens and keys are masked, and only about the last thousand calls are kept.</p>
+            <p class="envnote" id="keepEnv" hidden></p></div>
+          <button class="switch" type="button" role="switch" aria-checked="true" id="swKeep" data-setting="keepCalls" aria-label="Keep the text of blocked and asked calls" data-i18n-attr="aria-label"></button>
+        </div>
+        <div class="toggle-row">
+          <div><b data-i18n>Record allowed calls</b>
+            <p data-i18n>Allowed calls are recorded without their arguments. Turn off to keep the log to the calls that needed attention.</p>
+            <p class="envnote" id="allowEnv" hidden></p></div>
+          <button class="switch" type="button" role="switch" aria-checked="true" id="swAllowed" data-setting="auditAllows" aria-label="Record allowed calls" data-i18n-attr="aria-label"></button>
+        </div>
+        <div class="toggle-row">
+          <div><b data-i18n>Forget kept texts</b><p data-i18n>Deletes the kept command texts now. The log itself is never edited.</p></div>
+          <div id="forgetBox"><button class="btn small danger" type="button" id="forgetBtn"></button></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-i18n>Files</h2></div>
+        <dl class="files" id="files"></dl>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-i18n>This page</h2></div>
+        <p class="page-info" id="pageInfo"></p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="sr-only" id="announce" aria-live="assertive" aria-atomic="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"><span class="toast-icon" id="toastIcon" aria-hidden="true"></span><span id="toastText"></span><button type="button" class="toast-action" id="toastAction" hidden></button></div>
+</body>
+</html>

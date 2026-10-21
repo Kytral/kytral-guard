@@ -1,0 +1,72 @@
+name: Bug report
+description: Something does not work as documented (installation, an agent hook, the MCP proxy, the CLI, the SDK, the dashboard, the kill switch, the audit log).
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. **A security vulnerability must never be reported in a public issue**: follow the [security policy](https://github.com/Kytral/kytral-guard/security/policy) instead.
+  - type: checkboxes
+    id: no-secrets
+    attributes:
+      label: Before you post
+      description: Issues are public.
+      options:
+        - label: I have not pasted any secret (KYTRAL_SECRET, KYTRAL_AUDIT_SECRET, a badge, an API key or token), nor any part of an audit log, and I replaced private data, paths and tool arguments with made-up values.
+          required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, and what Kytral Guard did (its decision, the error message, the exit code).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The shortest sequence of commands, configuration or tool calls that shows the problem, with made-up values.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor-report
+    attributes:
+      label: Output of `kytral-guard doctor --report`
+      description: Add `--policy <file>` if your proxies use one. The output is redacted for a public issue (no secrets, variable values, audit entries, tool arguments, user or host names, full paths); read it before posting. Plain `kytral-guard doctor` is not redacted, so do not paste it here. If the command itself fails, paste its error.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Agent or client
+      description: The AI agent, MCP client or integration that runs Kytral Guard, with its version.
+      placeholder: Claude Code, Cursor, Codex, Gemini CLI, Claude Desktop, VS Code, n8n, the SDK in a Node.js app... and its version
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 15.1, Windows 11, Ubuntu 24.04, WSL 2...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Kytral Guard version
+      description: As shown in the first lines of `kytral-guard doctor --report`.
+      placeholder: 0.1.0
+    validations:
+      required: true

@@ -1,0 +1,15 @@
+Kytral Guard
+Copyright 2026 Kytral
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+"Kytral" and "Kytral Guard" are names of Kytral; the license does not grant
+permission to use them (Apache License 2.0, section 6). The Kytral logo and
+wordmark (src/dashboard/mark.svg, src/dashboard/wordmark.svg) are trademarks of
+Kytral and are not licensed under the Apache License: they may be redistributed
+only as part of this product, unmodified.
+
+The dashboard uses these fonts, under the SIL Open Font License, Version 1.1:
+- Space Grotesk, Copyright 2020 The Space Grotesk Project Authors
+  (src/dashboard/fonts/OFL-SpaceGrotesk.txt)
+- JetBrains Mono, Copyright 2020 The JetBrains Mono Project Authors
+  (src/dashboard/fonts/OFL-JetBrainsMono.txt)

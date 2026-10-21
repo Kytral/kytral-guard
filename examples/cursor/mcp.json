@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "filesystem-guarded": {
+      "command": "kytral-guard",
+      "args": ["--preset", "strict", "--", "npx", "-y", "@modelcontextprotocol/server-filesystem", "/PATH/TO/project"],
+      "env": {
+        "KYTRAL_AUDIENCE": "kytral-guard:cursor-filesystem",
+        "KYTRAL_BADGE": "<output of: KYTRAL_AUDIENCE=kytral-guard:cursor-filesystem kytral-guard badge cursor-agent '*' 1y>"
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+name: Missed catastrophe
+description: A destructive command or tool call that Kytral Guard allows (or only confirms when it should block).
+labels: ["missed-catastrophe"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! If the bypass defeats a whole analyzer or lets an attacker lift the kill switch or forge an approval,
+        never post it here: report it privately, by email to security@kytral.com, as the
+        [security policy](https://github.com/Kytral/kytral-guard/security/policy) explains.
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or tool call
+      description: The exact command line, or the tool call JSON (tool name and arguments). Remove secrets.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of `kytral-guard check --json "<command>"`
+      render: json
+    validations:
+      required: true
+  - type: dropdown
+    id: expected
+    attributes:
+      label: Expected decision
+      options: [block, confirm]
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: What it destroys, and how an agent could end up running it
+  - type: input
+    id: version
+    attributes:
+      label: Kytral Guard version and integration (hook agent, proxy, SDK)
+      placeholder: 0.1.0, Claude Code hook

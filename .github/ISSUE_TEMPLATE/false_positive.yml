@@ -1,0 +1,29 @@
+name: False positive
+description: A routine command or tool call that Kytral Guard blocks or asks about when it should be allowed.
+labels: ["false-positive"]
+body:
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or tool call
+      description: The exact command line, or the tool call JSON. Remove secrets.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: check
+    attributes:
+      label: Output of `kytral-guard check --json "<command>"`
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is routine
+      description: What the command does in your workflow, and how often an agent runs it.
+  - type: input
+    id: version
+    attributes:
+      label: Kytral Guard version, preset or policy, integration
+      placeholder: 0.1.0, coding-agent preset, Cursor hook

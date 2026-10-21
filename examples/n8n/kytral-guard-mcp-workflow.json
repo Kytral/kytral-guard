@@ -1,0 +1,16 @@
+{
+  "name": "Kytral Guard - AI agent with a guarded MCP server",
+  "nodes": [
+    { "parameters": {}, "id": "a1", "name": "When chat message received", "type": "@n8n/n8n-nodes-langchain.chatTrigger", "typeVersion": 1.1, "position": [0, 0] },
+    { "parameters": { "options": {} }, "id": "a2", "name": "AI Agent", "type": "@n8n/n8n-nodes-langchain.agent", "typeVersion": 1.7, "position": [260, 0] },
+    { "parameters": { "options": {} }, "id": "a3", "name": "OpenAI Chat Model", "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi", "typeVersion": 1.2, "position": [200, 220] },
+    { "parameters": {}, "id": "a4", "name": "MCP Client (via Kytral Guard)", "type": "n8n-nodes-mcp.mcpClientTool", "typeVersion": 1, "position": [420, 220],
+      "credentials": { "mcpClientApi": { "id": "", "name": "Kytral Guard stdio" } } }
+  ],
+  "connections": {
+    "When chat message received": { "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]] },
+    "OpenAI Chat Model": { "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]] },
+    "MCP Client (via Kytral Guard)": { "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]] }
+  },
+  "settings": {}
+}

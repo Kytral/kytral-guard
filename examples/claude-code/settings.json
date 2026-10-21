@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|PowerShell|Write|Edit|MultiEdit|NotebookEdit|Read)$|^mcp__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/PATH/TO/node",
+            "args": ["/PATH/TO/node_modules/kytral-guard/dist/cli.js", "hook", "claude-code"],
+            "timeout": 30,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}

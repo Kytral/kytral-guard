@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      { "command": "'/PATH/TO/node' '/PATH/TO/node_modules/kytral-guard/dist/cli.js' hook cursor", "timeout": 30, "failClosed": true }
+    ],
+    "beforeMCPExecution": [
+      { "command": "'/PATH/TO/node' '/PATH/TO/node_modules/kytral-guard/dist/cli.js' hook cursor", "timeout": 30, "failClosed": true }
+    ],
+    "preToolUse": [
+      { "command": "'/PATH/TO/node' '/PATH/TO/node_modules/kytral-guard/dist/cli.js' hook cursor", "timeout": 30, "failClosed": true, "matcher": "Write|Delete" }
+    ]
+  }
+}

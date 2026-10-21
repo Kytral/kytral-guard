@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "filesystem-guarded": {
+      "type": "stdio",
+      "command": "kytral-guard",
+      "args": ["--preset", "strict", "--", "npx", "-y", "@modelcontextprotocol/server-filesystem", "/PATH/TO/project"],
+      "env": {
+        "KYTRAL_AUDIENCE": "kytral-guard:claude-filesystem",
+        "KYTRAL_BADGE": "${KYTRAL_BADGE}"
+      }
+    }
+  }
+}
