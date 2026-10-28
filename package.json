@@ -85,11 +85,11 @@
     "yaml": "^2.9.1"
   },
   "devDependencies": {
-    "@modelcontextprotocol/server-filesystem": "^1.0.0",
-    "@types/node": "^22.20.5",
+    "@modelcontextprotocol/server-filesystem": "^2.0.1",
+    "@types/node": "^25.9.9",
     "@types/shell-quote": "^1.7.5",
     "esbuild": "^0.28.2",
     "tsx": "^4.23.15",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   }
 }
